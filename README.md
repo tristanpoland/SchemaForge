@@ -23,10 +23,10 @@ A modern, intuitive database schema designer built with React. Create, visualize
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/schemaforge.git
+git clone https://github.com/tristanpoland/SchemaForge.git
 
 # Navigate to project directory
-cd schemaforge
+cd SchemaForge
 
 # Install dependencies
 npm install
@@ -74,7 +74,3 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
