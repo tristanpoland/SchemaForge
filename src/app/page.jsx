@@ -29,6 +29,68 @@ import {
 } from "@/components/ui/Select"
 import { Checkbox } from "@/components/ui/Checkbox"
 
+const parseSQL = (sql) => {
+  const tables = [];
+  const tableRegex = /CREATE TABLE (\w+) \(([\s\S]*?)\);/g;
+  const columnRegex = /\s*(\w+)\s+([A-Z]+(?:\([^)]+\))?)\s*(?:(?:NOT NULL|PRIMARY KEY)?\s*,?)?/g;
+  const foreignKeyRegex = /FOREIGN KEY \((\w+)\) REFERENCES (\w+)\((\w+)\)/g;
+
+  let match;
+  while ((match = tableRegex.exec(sql)) !== null) {
+    const tableName = match[1];
+    const columnsString = match[2];
+    
+    const table = {
+      id: `table-${Date.now()}-${Math.random()}`,
+      name: tableName,
+      columns: [],
+      position: { x: 50 + Math.random() * 200, y: 50 + Math.random() * 200 }
+    };
+
+    // Parse columns
+    let columnMatch;
+    while ((columnMatch = columnRegex.exec(columnsString)) !== null) {
+      const columnName = columnMatch[1];
+      const columnType = columnMatch[2];
+      
+      // Skip if this is a FOREIGN KEY declaration
+      if (columnName === 'FOREIGN') continue;
+      
+      const isPrimaryKey = columnsString.includes(`${columnName} ${columnType} PRIMARY KEY`) ||
+                          columnsString.includes(`PRIMARY KEY (${columnName})`);
+      const isNotNull = columnsString.includes(`${columnName} ${columnType} NOT NULL`);
+      
+      table.columns.push({
+        name: columnName,
+        type: columnType,
+        primaryKey: isPrimaryKey,
+        notNull: isNotNull
+      });
+    }
+
+    // Parse foreign keys
+    let fkMatch;
+    while ((fkMatch = foreignKeyRegex.exec(columnsString)) !== null) {
+      const columnName = fkMatch[1];
+      const referenceTable = fkMatch[2];
+      const referenceColumn = fkMatch[3];
+      
+      // Find the column and add foreign key info
+      const column = table.columns.find(col => col.name === columnName);
+      if (column) {
+        column.foreignKey = {
+          table: referenceTable,
+          column: referenceColumn
+        };
+      }
+    }
+
+    tables.push(table);
+  }
+
+  return tables;
+};
+
 const TableNode = ({ 
   table, 
   position, 
@@ -38,8 +100,8 @@ const TableNode = ({
   onEdit,
   onDelete,
   scale,
-  allTables,  // Add this to get all tables for foreign key selection
-  onUpdateForeignKey  // Add this to handle foreign key updates
+  allTables,
+  onUpdateForeignKey
 }) => {
   return (
     <div
@@ -87,6 +149,7 @@ const TableNode = ({
                   {column.name}
                   {column.primaryKey && '🔑'}
                   {column.foreignKey && '🔗'}
+                  {column.notNull && '*'}
                 </td>
                 <td className="px-2 py-1 text-neutral-400">
                   {column.type}
@@ -104,7 +167,6 @@ const TableNode = ({
 const EditTableDialog = ({ table, onSave, allTables, open, onOpenChange }) => {
   const [editedTable, setEditedTable] = useState({ ...table });
   
-  // Update editedTable when the input table changes
   useEffect(() => {
     setEditedTable({ ...table });
   }, [table]);
@@ -112,7 +174,7 @@ const EditTableDialog = ({ table, onSave, allTables, open, onOpenChange }) => {
   const addColumn = () => {
     setEditedTable(prev => ({
       ...prev,
-      columns: [...prev.columns, { name: '', type: 'VARCHAR', primaryKey: false }]
+      columns: [...prev.columns, { name: '', type: 'VARCHAR', primaryKey: false, notNull: false }]
     }));
   };
 
@@ -200,6 +262,14 @@ const EditTableDialog = ({ table, onSave, allTables, open, onOpenChange }) => {
                   />
                   <label htmlFor={`pk-${idx}`} className="text-sm">PK</label>
                 </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    checked={column.notNull}
+                    onCheckedChange={(checked) => updateColumn(idx, 'notNull', checked)}
+                    id={`nn-${idx}`}
+                  />
+                  <label htmlFor={`nn-${idx}`} className="text-sm">NOT NULL</label>
+                </div>
                 {!column.primaryKey && (
                   <Select
                     value={column.foreignKey ? `${column.foreignKey.table}.${column.foreignKey.column}` : 'none'}
@@ -273,6 +343,8 @@ const SchemaForge = () => {
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
+  const [isPanning, setIsPanning] = useState(false);
+  const [lastPanPoint, setLastPanPoint] = useState({ x: 0, y: 0 });
   const [draggedTable, setDraggedTable] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [editingTable, setEditingTable] = useState(null);
@@ -286,8 +358,8 @@ const SchemaForge = () => {
       id: `table-${Date.now()}`,
       name: `Table${tables.length + 1}`,
       columns: [
-        { name: 'id', type: 'INT', primaryKey: true },
-        { name: 'created_at', type: 'TIMESTAMP' }
+        { name: 'id', type: 'INT', primaryKey: true, notNull: true },
+        { name: 'created_at', type: 'TIMESTAMP', notNull: false }
       ],
       position: { x: 50, y: 50 }
     };
@@ -321,17 +393,25 @@ const SchemaForge = () => {
 
   const generateSQL = () => {
     let sql = '';
-    tables.forEach(table => {
+    // Add header comment
+    sql += '-- Generated by SchemaForge\n';
+    sql += `-- Generated at: ${new Date().toISOString()}\n\n`;
+
+    // Sort tables to handle foreign key dependencies
+    const sortedTables = [...tables].sort((a, b) => {
+      const aHasForeignKeys = a.columns.some(col => col.foreignKey);
+      const bHasForeignKeys = b.columns.some(col => col.foreignKey);
+      return aHasForeignKeys ? 1 : bHasForeignKeys ? -1 : 0;
+    });
+    
+    sortedTables.forEach(table => {
       sql += `CREATE TABLE ${table.name} (\n`;
       
-      // Add columns
-      const columnDefinitions = table.columns.map(column => {
+      // Column definitions
+      const columnDefs = table.columns.map(column => {
         let def = `  ${column.name} ${column.type}`;
         if (column.primaryKey) {
           def += ' PRIMARY KEY';
-        }
-        if (column.autoIncrement) {
-          def += ' AUTO_INCREMENT';
         }
         if (column.notNull) {
           def += ' NOT NULL';
@@ -339,7 +419,14 @@ const SchemaForge = () => {
         return def;
       });
       
-      sql += columnDefinitions.join(',\n');
+      // Foreign key constraints
+      const foreignKeys = table.columns
+        .filter(column => column.foreignKey)
+        .map(column => 
+          `  FOREIGN KEY (${column.name}) REFERENCES ${column.foreignKey.table}(${column.foreignKey.column})`
+        );
+      
+      sql += [...columnDefs, ...foreignKeys].join(',\n');
       sql += '\n);\n\n';
     });
     
@@ -348,7 +435,7 @@ const SchemaForge = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'database-schema.sql';
+    a.download = 'schema.sql';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -364,24 +451,21 @@ const SchemaForge = () => {
 
     // Update relationships based on foreign keys
     const newRelationships = [];
-    editedTable.columns.forEach(column => {
-      if (column.foreignKey) {
-        newRelationships.push({
-          id: `rel-${editedTable.id}-${column.name}`,
-          fromTable: editedTable.name,
-          fromColumn: column.name,
-          toTable: column.foreignKey.table,
-          toColumn: column.foreignKey.column
-        });
-      }
+    tables.forEach(table => {
+      table.columns.forEach(column => {
+        if (column.foreignKey) {
+          newRelationships.push({
+            id: `rel-${table.id}-${column.name}`,
+            fromTable: table.name,
+            fromColumn: column.name,
+            toTable: column.foreignKey.table,
+            toColumn: column.foreignKey.column
+          });
+        }
+      });
     });
 
-    setRelationships(prevRels => {
-      const filteredRels = prevRels.filter(rel => 
-        rel.fromTable !== editedTable.name
-      );
-      return [...filteredRels, ...newRelationships];
-    });
+    setRelationships(newRelationships);
   };
 
   return (
@@ -398,7 +482,27 @@ const SchemaForge = () => {
       
       <div className="h-16 border-b border-neutral-800 flex items-center justify-between px-4">
         <h1 className="text-xl font-semibold">SchemaForge</h1>
-        <div className="flex space-x-4">
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <Button
+              onClick={() => setZoom(prev => Math.max(prev * 0.9, 0.1))}
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+            >
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <span className="text-sm">{Math.round(zoom * 100)}%</span>
+            <Button
+              onClick={() => setZoom(prev => Math.min(prev * 1.1, 2))}
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+            >
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+          </div>
+          
           <Button
             onClick={addTable}
             className="flex items-center bg-neutral-800 hover:bg-neutral-700"
@@ -406,29 +510,91 @@ const SchemaForge = () => {
             <Plus className="w-4 h-4 mr-2" />
             Add Table
           </Button>
+          
+          <label className="flex items-center bg-neutral-800 hover:bg-neutral-700 px-4 py-2 rounded-md cursor-pointer">
+            <FileText className="w-4 h-4 mr-2" />
+            Import SQL
+            <input
+              type="file"
+              accept=".sql"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = (event) => {
+                    const sql = event.target?.result;
+                    if (typeof sql === 'string') {
+                      const importedTables = parseSQL(sql);
+                      setTables(importedTables);
+                    }
+                  };
+                  reader.readAsText(file);
+                }
+              }}
+            />
+          </label>
+          
           <Button
             onClick={generateSQL}
             className="flex items-center bg-neutral-800 hover:bg-neutral-700"
           >
             <FileText className="w-4 h-4 mr-2" />
-            Generate SQL
+            Export SQL
           </Button>
         </div>
       </div>
 
-      <div className="flex-1 relative overflow-hidden"
-           ref={canvasRef}
-           onMouseMove={handleTableDrag}
-           onMouseUp={() => {
-             setIsDragging(false);
-             setDraggedTable(null);
-           }}>
-        <div style={{
-          transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
-          transformOrigin: '0 0',
-          width: '100%',
-          height: '100%'
-        }}>
+      <div 
+        className="flex-1 relative overflow-hidden"
+        ref={canvasRef}
+        onMouseMove={(e) => {
+          if (isPanning) {
+            const dx = (e.clientX - lastPanPoint.x) / zoom;
+            const dy = (e.clientY - lastPanPoint.y) / zoom;
+            setPan(prev => ({
+              x: prev.x + dx,
+              y: prev.y + dy
+            }));
+            setLastPanPoint({ x: e.clientX, y: e.clientY });
+          } else if (isDragging) {
+            handleTableDrag(e);
+          }
+        }}
+        onMouseUp={() => {
+          setIsDragging(false);
+          setIsPanning(false);
+          setDraggedTable(null);
+        }}
+        onMouseLeave={() => {
+          setIsDragging(false);
+          setIsPanning(false);
+          setDraggedTable(null);
+        }}
+        onMouseDown={(e) => {
+          // Middle mouse button (button 1)
+          if (e.button === 1) {
+            e.preventDefault();
+            setIsPanning(true);
+            setLastPanPoint({ x: e.clientX, y: e.clientY });
+          }
+        }}
+        onWheel={(e) => {
+          if (e.ctrlKey) {
+            e.preventDefault();
+            const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+            setZoom(prev => Math.min(Math.max(prev * zoomFactor, 0.1), 2));
+          }
+        }}
+      >
+        <div
+          style={{
+            transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
+            transformOrigin: '0 0',
+            width: '100%',
+            height: '100%'
+          }}
+        >
           {/* Relationship lines */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none">
             {relationships.map(rel => {
@@ -436,8 +602,8 @@ const SchemaForge = () => {
               const toTable = tables.find(t => t.name === rel.toTable);
               if (!fromTable || !toTable) return null;
 
-              const fromX = fromTable.position.x + 200; // Assuming table width is 200
-              const fromY = fromTable.position.y + 40; // Middle of the table
+              const fromX = fromTable.position.x + 200;
+              const fromY = fromTable.position.y + 40;
               const toX = toTable.position.x;
               const toY = toTable.position.y + 40;
 
@@ -452,7 +618,6 @@ const SchemaForge = () => {
                     strokeWidth={2 / zoom}
                     markerEnd="url(#arrowhead)"
                   />
-                  {/* Optional: Add a small circle at the start of the line */}
                   <circle
                     cx={fromX}
                     cy={fromY}
@@ -462,7 +627,6 @@ const SchemaForge = () => {
                 </g>
               );
             })}
-            {/* Define arrowhead marker */}
             <defs>
               <marker
                 id="arrowhead"
@@ -488,12 +652,16 @@ const SchemaForge = () => {
               onDragStart={(e) => handleTableDragStart(e, table.id)}
               onDelete={() => {
                 setTables(tables.filter(t => t.id !== table.id));
+                setRelationships(relationships.filter(
+                  rel => rel.fromTable !== table.name && rel.toTable !== table.name
+                ));
               }}
               onEdit={() => {
                 setEditingTable(table);
                 setIsEditDialogOpen(true);
               }}
               scale={zoom}
+              allTables={tables}
             />
           ))}
         </div>
