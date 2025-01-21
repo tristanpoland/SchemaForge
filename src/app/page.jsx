@@ -29,11 +29,20 @@ import {
 } from "@/components/ui/Select"
 import { Checkbox } from "@/components/ui/Checkbox"
 
-const parseSQL = (sql) => {
+const parseSQL = (sql, dialect = 'standard') => {
   const tables = [];
-  const tableRegex = /CREATE TABLE (\w+) \(([\s\S]*?)\);/g;
-  const columnRegex = /\s*(\w+)\s+([A-Z]+(?:\([^)]+\))?)\s*(?:(?:NOT NULL|PRIMARY KEY)?\s*,?)?/g;
-  const foreignKeyRegex = /FOREIGN KEY \((\w+)\) REFERENCES (\w+)\((\w+)\)/g;
+  // Handle different schema prefixes (e.g., "public.")
+  const tableRegex = /CREATE TABLE (?:[\w.]+\.)?([\w]+)\s*\(([\s\S]*?)\)(?:\s*LOCALITY[\s\S]*?(?=CREATE|$)|\s*(?=CREATE|$))/gi;
+  
+  // Enhanced column regex to handle more complex types and constraints
+  const columnRegex = /\s*([\w_]+)\s+([\w]+(?:\([\w\s,]*\))?)\s*(?:NOT NULL|NULL)?\s*(?:DEFAULT\s+[\w_()]+)?,?/gi;
+  
+  // Handle primary key constraints in different formats
+  const primaryKeyRegex = /CONSTRAINT\s+[\w_]+\s+PRIMARY KEY\s*\(([\w\s,]+)(?:\s+ASC)?\)/gi;
+  const simplePrimaryKeyRegex = /PRIMARY KEY\s*\(([\w\s,]+)(?:\s+ASC)?\)/gi;
+  
+  // Enhanced foreign key regex for different dialects
+  const foreignKeyRegex = /(?:CONSTRAINT\s+[\w_]+\s+)?FOREIGN KEY\s*\(([\w_]+)\)\s*REFERENCES\s+([\w.]+)\s*\(([\w_]+)\)/gi;
 
   let match;
   while ((match = tableRegex.exec(sql)) !== null) {
@@ -50,15 +59,36 @@ const parseSQL = (sql) => {
     // Parse columns
     let columnMatch;
     while ((columnMatch = columnRegex.exec(columnsString)) !== null) {
-      const columnName = columnMatch[1];
-      const columnType = columnMatch[2];
+      if (columnMatch[1].toUpperCase() === 'CONSTRAINT') continue;
       
-      // Skip if this is a FOREIGN KEY declaration
-      if (columnName === 'FOREIGN') continue;
+      const columnName = columnMatch[1];
+      let columnType = columnMatch[2].toUpperCase();
+      
+      // Skip if this is a FOREIGN KEY or CONSTRAINT declaration
+      if (['FOREIGN', 'PRIMARY', 'CONSTRAINT'].includes(columnName.toUpperCase())) continue;
+      
+      // Standardize type names across different dialects
+      const typeMap = {
+        'INT8': 'BIGINT',
+        'STRING': 'TEXT',
+        'BOOL': 'BOOLEAN',
+        'TIMESTAMP': 'TIMESTAMP',
+        'SERIAL': 'INT'
+      };
+      
+      Object.entries(typeMap).forEach(([from, to]) => {
+        if (columnType.includes(from)) columnType = to;
+      });
       
       const isPrimaryKey = columnsString.includes(`${columnName} ${columnType} PRIMARY KEY`) ||
-                          columnsString.includes(`PRIMARY KEY (${columnName})`);
-      const isNotNull = columnsString.includes(`${columnName} ${columnType} NOT NULL`);
+                          columnsString.includes(`PRIMARY KEY (${columnName})`) ||
+                          columnsString.toLowerCase().includes(`constraint`) && 
+                          columnsString.toLowerCase().includes(`primary key`) && 
+                          columnsString.toLowerCase().includes(`(${columnName.toLowerCase()}`) ||
+                          columnsString.toLowerCase().includes(`(${columnName.toLowerCase()} asc`);
+                          
+      const isNotNull = columnsString.includes(`${columnName} ${columnType} NOT NULL`) ||
+                       columnsString.includes(`${columnName} ${columnType} NULL`) === false;
       
       table.columns.push({
         name: columnName,
@@ -338,8 +368,17 @@ const EditTableDialog = ({ table, onSave, allTables, open, onOpenChange }) => {
   );
 };
 
+const SUPPORTED_DIALECTS = {
+  'standard': 'Standard SQL',
+  'postgresql': 'PostgreSQL',
+  'mysql': 'MySQL',
+  'cockroachdb': 'CockroachDB',
+  'sqlite': 'SQLite'
+};
+
 const SchemaForge = () => {
   const [tables, setTables] = useState([]);
+  const [selectedDialect, setSelectedDialect] = useState('standard');
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -511,29 +550,47 @@ const SchemaForge = () => {
             Add Table
           </Button>
           
-          <label className="flex items-center bg-neutral-800 hover:bg-neutral-700 px-4 py-2 rounded-md cursor-pointer">
-            <FileText className="w-4 h-4 mr-2" />
-            Import SQL
-            <input
-              type="file"
-              accept=".sql"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  const reader = new FileReader();
-                  reader.onload = (event) => {
-                    const sql = event.target?.result;
-                    if (typeof sql === 'string') {
-                      const importedTables = parseSQL(sql);
-                      setTables(importedTables);
-                    }
-                  };
-                  reader.readAsText(file);
-                }
-              }}
-            />
-          </label>
+          <div className="flex items-center space-x-2">
+            <Select
+              value={selectedDialect}
+              onValueChange={setSelectedDialect}
+            >
+              <SelectTrigger className="w-40 bg-neutral-700 border-neutral-600">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-neutral-700 border-neutral-600">
+                {Object.entries(SUPPORTED_DIALECTS).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <label className="flex items-center bg-neutral-800 hover:bg-neutral-700 px-4 py-2 rounded-md cursor-pointer">
+              <FileText className="w-4 h-4 mr-2" />
+              Import SQL
+              <input
+                type="file"
+                accept=".sql"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      const sql = event.target?.result;
+                      if (typeof sql === 'string') {
+                        const importedTables = parseSQL(sql, selectedDialect);
+                        setTables(importedTables);
+                      }
+                    };
+                    reader.readAsText(file);
+                  }
+                }}
+              />
+            </label>
+          </div>
           
           <Button
             onClick={generateSQL}
