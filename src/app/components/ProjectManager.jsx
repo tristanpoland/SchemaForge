@@ -62,7 +62,8 @@ const ProjectManager = ({ onOpenProject, onNewProject }) => {
 
   const handleSampleProjectLoad = async (sample) => {
     try {
-      const response = await fetch(`/samples/${sample.filename}`);
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+      const response = await fetch(`${basePath}/samples/${sample.filename}`);
       if (!response.ok) {
         throw new Error(`Sample project not found: ${sample.filename}`);
       }
