@@ -1,0 +1,754 @@
+{
+  "projectName": "E-commerce Database",
+  "nodes": [
+    {
+      "id": "users",
+      "type": "table",
+      "position": { "x": 100, "y": 100 },
+      "data": {
+        "tableName": "users",
+        "fields": [
+          {
+            "id": 1,
+            "name": "id",
+            "type": "BIGINT",
+            "nullable": false,
+            "primaryKey": true,
+            "autoIncrement": true,
+            "unique": true
+          },
+          {
+            "id": 2,
+            "name": "email",
+            "type": "VARCHAR",
+            "length": "255",
+            "nullable": false,
+            "unique": true
+          },
+          {
+            "id": 3,
+            "name": "password_hash",
+            "type": "VARCHAR",
+            "length": "255",
+            "nullable": false
+          },
+          {
+            "id": 4,
+            "name": "first_name",
+            "type": "VARCHAR",
+            "length": "100",
+            "nullable": false
+          },
+          {
+            "id": 5,
+            "name": "last_name",
+            "type": "VARCHAR",
+            "length": "100",
+            "nullable": false
+          },
+          {
+            "id": 6,
+            "name": "phone",
+            "type": "VARCHAR",
+            "length": "20",
+            "nullable": true
+          },
+          {
+            "id": 7,
+            "name": "email_verified",
+            "type": "BOOLEAN",
+            "nullable": false,
+            "defaultValue": "false"
+          },
+          {
+            "id": 8,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          },
+          {
+            "id": 9,
+            "name": "updated_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          }
+        ]
+      }
+    },
+    {
+      "id": "categories",
+      "type": "table",
+      "position": { "x": 500, "y": 100 },
+      "data": {
+        "tableName": "categories",
+        "fields": [
+          {
+            "id": 10,
+            "name": "id",
+            "type": "BIGINT",
+            "nullable": false,
+            "primaryKey": true,
+            "autoIncrement": true,
+            "unique": true
+          },
+          {
+            "id": 11,
+            "name": "name",
+            "type": "VARCHAR",
+            "length": "100",
+            "nullable": false
+          },
+          {
+            "id": 12,
+            "name": "description",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "id": 13,
+            "name": "parent_id",
+            "type": "BIGINT",
+            "nullable": true,
+            "foreignKey": true,
+            "referencedTable": "categories",
+            "referencedField": 10
+          },
+          {
+            "id": 14,
+            "name": "image_url",
+            "type": "VARCHAR",
+            "length": "255",
+            "nullable": true
+          },
+          {
+            "id": 15,
+            "name": "is_active",
+            "type": "BOOLEAN",
+            "nullable": false,
+            "defaultValue": "true"
+          },
+          {
+            "id": 16,
+            "name": "sort_order",
+            "type": "INT",
+            "nullable": false,
+            "defaultValue": "0"
+          },
+          {
+            "id": 17,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          }
+        ]
+      }
+    },
+    {
+      "id": "products",
+      "type": "table",
+      "position": { "x": 900, "y": 100 },
+      "data": {
+        "tableName": "products",
+        "fields": [
+          {
+            "id": 18,
+            "name": "id",
+            "type": "BIGINT",
+            "nullable": false,
+            "primaryKey": true,
+            "autoIncrement": true,
+            "unique": true
+          },
+          {
+            "id": 19,
+            "name": "name",
+            "type": "VARCHAR",
+            "length": "255",
+            "nullable": false
+          },
+          {
+            "id": 20,
+            "name": "description",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "id": 21,
+            "name": "sku",
+            "type": "VARCHAR",
+            "length": "100",
+            "nullable": false,
+            "unique": true
+          },
+          {
+            "id": 22,
+            "name": "category_id",
+            "type": "BIGINT",
+            "nullable": false,
+            "foreignKey": true,
+            "referencedTable": "categories",
+            "referencedField": 10
+          },
+          {
+            "id": 23,
+            "name": "price",
+            "type": "DECIMAL",
+            "length": "10,2",
+            "nullable": false
+          },
+          {
+            "id": 24,
+            "name": "cost",
+            "type": "DECIMAL",
+            "length": "10,2",
+            "nullable": true
+          },
+          {
+            "id": 25,
+            "name": "weight",
+            "type": "DECIMAL",
+            "length": "8,2",
+            "nullable": true
+          },
+          {
+            "id": 26,
+            "name": "stock_quantity",
+            "type": "INT",
+            "nullable": false,
+            "defaultValue": "0"
+          },
+          {
+            "id": 27,
+            "name": "is_active",
+            "type": "BOOLEAN",
+            "nullable": false,
+            "defaultValue": "true"
+          },
+          {
+            "id": 28,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          }
+        ]
+      }
+    },
+    {
+      "id": "addresses",
+      "type": "table",
+      "position": { "x": 100, "y": 400 },
+      "data": {
+        "tableName": "addresses",
+        "fields": [
+          {
+            "id": 29,
+            "name": "id",
+            "type": "BIGINT",
+            "nullable": false,
+            "primaryKey": true,
+            "autoIncrement": true,
+            "unique": true
+          },
+          {
+            "id": 30,
+            "name": "user_id",
+            "type": "BIGINT",
+            "nullable": false,
+            "foreignKey": true,
+            "referencedTable": "users",
+            "referencedField": 1
+          },
+          {
+            "id": 31,
+            "name": "type",
+            "type": "VARCHAR",
+            "length": "20",
+            "nullable": false
+          },
+          {
+            "id": 32,
+            "name": "first_name",
+            "type": "VARCHAR",
+            "length": "100",
+            "nullable": false
+          },
+          {
+            "id": 33,
+            "name": "last_name",
+            "type": "VARCHAR",
+            "length": "100",
+            "nullable": false
+          },
+          {
+            "id": 34,
+            "name": "company",
+            "type": "VARCHAR",
+            "length": "100",
+            "nullable": true
+          },
+          {
+            "id": 35,
+            "name": "street_address",
+            "type": "VARCHAR",
+            "length": "255",
+            "nullable": false
+          },
+          {
+            "id": 36,
+            "name": "city",
+            "type": "VARCHAR",
+            "length": "100",
+            "nullable": false
+          },
+          {
+            "id": 37,
+            "name": "state",
+            "type": "VARCHAR",
+            "length": "100",
+            "nullable": false
+          },
+          {
+            "id": 38,
+            "name": "postal_code",
+            "type": "VARCHAR",
+            "length": "20",
+            "nullable": false
+          },
+          {
+            "id": 39,
+            "name": "country",
+            "type": "VARCHAR",
+            "length": "2",
+            "nullable": false,
+            "defaultValue": "US"
+          },
+          {
+            "id": 40,
+            "name": "is_default",
+            "type": "BOOLEAN",
+            "nullable": false,
+            "defaultValue": "false"
+          }
+        ]
+      }
+    },
+    {
+      "id": "orders",
+      "type": "table",
+      "position": { "x": 500, "y": 400 },
+      "data": {
+        "tableName": "orders",
+        "fields": [
+          {
+            "id": 41,
+            "name": "id",
+            "type": "BIGINT",
+            "nullable": false,
+            "primaryKey": true,
+            "autoIncrement": true,
+            "unique": true
+          },
+          {
+            "id": 42,
+            "name": "user_id",
+            "type": "BIGINT",
+            "nullable": false,
+            "foreignKey": true,
+            "referencedTable": "users",
+            "referencedField": 1
+          },
+          {
+            "id": 43,
+            "name": "order_number",
+            "type": "VARCHAR",
+            "length": "50",
+            "nullable": false,
+            "unique": true
+          },
+          {
+            "id": 44,
+            "name": "status",
+            "type": "VARCHAR",
+            "length": "20",
+            "nullable": false,
+            "defaultValue": "pending"
+          },
+          {
+            "id": 45,
+            "name": "subtotal",
+            "type": "DECIMAL",
+            "length": "10,2",
+            "nullable": false
+          },
+          {
+            "id": 46,
+            "name": "tax_amount",
+            "type": "DECIMAL",
+            "length": "10,2",
+            "nullable": false,
+            "defaultValue": "0.00"
+          },
+          {
+            "id": 47,
+            "name": "shipping_amount",
+            "type": "DECIMAL",
+            "length": "10,2",
+            "nullable": false,
+            "defaultValue": "0.00"
+          },
+          {
+            "id": 48,
+            "name": "total_amount",
+            "type": "DECIMAL",
+            "length": "10,2",
+            "nullable": false
+          },
+          {
+            "id": 49,
+            "name": "shipping_address_id",
+            "type": "BIGINT",
+            "nullable": true,
+            "foreignKey": true,
+            "referencedTable": "addresses",
+            "referencedField": 29
+          },
+          {
+            "id": 50,
+            "name": "billing_address_id",
+            "type": "BIGINT",
+            "nullable": true,
+            "foreignKey": true,
+            "referencedTable": "addresses",
+            "referencedField": 29
+          },
+          {
+            "id": 51,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          }
+        ]
+      }
+    },
+    {
+      "id": "order_items",
+      "type": "table",
+      "position": { "x": 900, "y": 400 },
+      "data": {
+        "tableName": "order_items",
+        "fields": [
+          {
+            "id": 52,
+            "name": "id",
+            "type": "BIGINT",
+            "nullable": false,
+            "primaryKey": true,
+            "autoIncrement": true,
+            "unique": true
+          },
+          {
+            "id": 53,
+            "name": "order_id",
+            "type": "BIGINT",
+            "nullable": false,
+            "foreignKey": true,
+            "referencedTable": "orders",
+            "referencedField": 41
+          },
+          {
+            "id": 54,
+            "name": "product_id",
+            "type": "BIGINT",
+            "nullable": false,
+            "foreignKey": true,
+            "referencedTable": "products",
+            "referencedField": 18
+          },
+          {
+            "id": 55,
+            "name": "quantity",
+            "type": "INT",
+            "nullable": false
+          },
+          {
+            "id": 56,
+            "name": "unit_price",
+            "type": "DECIMAL",
+            "length": "10,2",
+            "nullable": false
+          },
+          {
+            "id": 57,
+            "name": "total_price",
+            "type": "DECIMAL",
+            "length": "10,2",
+            "nullable": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "cart_items",
+      "type": "table",
+      "position": { "x": 100, "y": 700 },
+      "data": {
+        "tableName": "cart_items",
+        "fields": [
+          {
+            "id": 58,
+            "name": "id",
+            "type": "BIGINT",
+            "nullable": false,
+            "primaryKey": true,
+            "autoIncrement": true,
+            "unique": true
+          },
+          {
+            "id": 59,
+            "name": "user_id",
+            "type": "BIGINT",
+            "nullable": false,
+            "foreignKey": true,
+            "referencedTable": "users",
+            "referencedField": 1
+          },
+          {
+            "id": 60,
+            "name": "product_id",
+            "type": "BIGINT",
+            "nullable": false,
+            "foreignKey": true,
+            "referencedTable": "products",
+            "referencedField": 18
+          },
+          {
+            "id": 61,
+            "name": "quantity",
+            "type": "INT",
+            "nullable": false,
+            "defaultValue": "1"
+          },
+          {
+            "id": 62,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          }
+        ]
+      }
+    },
+    {
+      "id": "reviews",
+      "type": "table",
+      "position": { "x": 500, "y": 700 },
+      "data": {
+        "tableName": "reviews",
+        "fields": [
+          {
+            "id": 63,
+            "name": "id",
+            "type": "BIGINT",
+            "nullable": false,
+            "primaryKey": true,
+            "autoIncrement": true,
+            "unique": true
+          },
+          {
+            "id": 64,
+            "name": "user_id",
+            "type": "BIGINT",
+            "nullable": false,
+            "foreignKey": true,
+            "referencedTable": "users",
+            "referencedField": 1
+          },
+          {
+            "id": 65,
+            "name": "product_id",
+            "type": "BIGINT",
+            "nullable": false,
+            "foreignKey": true,
+            "referencedTable": "products",
+            "referencedField": 18
+          },
+          {
+            "id": 66,
+            "name": "rating",
+            "type": "TINYINT",
+            "nullable": false
+          },
+          {
+            "id": 67,
+            "name": "title",
+            "type": "VARCHAR",
+            "length": "255",
+            "nullable": true
+          },
+          {
+            "id": 68,
+            "name": "comment",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "id": 69,
+            "name": "is_verified",
+            "type": "BOOLEAN",
+            "nullable": false,
+            "defaultValue": "false"
+          },
+          {
+            "id": 70,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "categories-categories",
+      "source": "categories",
+      "target": "categories",
+      "sourceHandle": "categories-13-source",
+      "targetHandle": "categories-10-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "13", "targetField": "10", "foreignKey": true }
+    },
+    {
+      "id": "products-categories",
+      "source": "products",
+      "target": "categories",
+      "sourceHandle": "products-22-source",
+      "targetHandle": "categories-10-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "22", "targetField": "10", "foreignKey": true }
+    },
+    {
+      "id": "addresses-users",
+      "source": "addresses",
+      "target": "users",
+      "sourceHandle": "addresses-30-source",
+      "targetHandle": "users-1-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "30", "targetField": "1", "foreignKey": true }
+    },
+    {
+      "id": "orders-users",
+      "source": "orders",
+      "target": "users",
+      "sourceHandle": "orders-42-source",
+      "targetHandle": "users-1-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "42", "targetField": "1", "foreignKey": true }
+    },
+    {
+      "id": "orders-addresses-shipping",
+      "source": "orders",
+      "target": "addresses",
+      "sourceHandle": "orders-49-source",
+      "targetHandle": "addresses-29-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "49", "targetField": "29", "foreignKey": true }
+    },
+    {
+      "id": "orders-addresses-billing",
+      "source": "orders",
+      "target": "addresses",
+      "sourceHandle": "orders-50-source",
+      "targetHandle": "addresses-29-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "50", "targetField": "29", "foreignKey": true }
+    },
+    {
+      "id": "order_items-orders",
+      "source": "order_items",
+      "target": "orders",
+      "sourceHandle": "order_items-53-source",
+      "targetHandle": "orders-41-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "53", "targetField": "41", "foreignKey": true }
+    },
+    {
+      "id": "order_items-products",
+      "source": "order_items",
+      "target": "products",
+      "sourceHandle": "order_items-54-source",
+      "targetHandle": "products-18-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "54", "targetField": "18", "foreignKey": true }
+    },
+    {
+      "id": "cart_items-users",
+      "source": "cart_items",
+      "target": "users",
+      "sourceHandle": "cart_items-59-source",
+      "targetHandle": "users-1-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "59", "targetField": "1", "foreignKey": true }
+    },
+    {
+      "id": "cart_items-products",
+      "source": "cart_items",
+      "target": "products",
+      "sourceHandle": "cart_items-60-source",
+      "targetHandle": "products-18-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "60", "targetField": "18", "foreignKey": true }
+    },
+    {
+      "id": "reviews-users",
+      "source": "reviews",
+      "target": "users",
+      "sourceHandle": "reviews-64-source",
+      "targetHandle": "users-1-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "64", "targetField": "1", "foreignKey": true }
+    },
+    {
+      "id": "reviews-products",
+      "source": "reviews",
+      "target": "products",
+      "sourceHandle": "reviews-65-source",
+      "targetHandle": "products-18-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "65", "targetField": "18", "foreignKey": true }
+    }
+  ],
+  "schema": {},
+  "timestamp": "2024-12-22T00:00:00.000Z",
+  "version": "1.0"
+}

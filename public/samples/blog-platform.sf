@@ -1,0 +1,726 @@
+{
+  "projectName": "Blog Platform",
+  "nodes": [
+    {
+      "id": "users",
+      "type": "table",
+      "position": { "x": 100, "y": 100 },
+      "data": {
+        "tableName": "users",
+        "fields": [
+          {
+            "id": 1,
+            "name": "id",
+            "type": "BIGINT",
+            "nullable": false,
+            "primaryKey": true,
+            "autoIncrement": true,
+            "unique": true
+          },
+          {
+            "id": 2,
+            "name": "username",
+            "type": "VARCHAR",
+            "length": "50",
+            "nullable": false,
+            "unique": true
+          },
+          {
+            "id": 3,
+            "name": "email",
+            "type": "VARCHAR",
+            "length": "255",
+            "nullable": false,
+            "unique": true
+          },
+          {
+            "id": 4,
+            "name": "password_hash",
+            "type": "VARCHAR",
+            "length": "255",
+            "nullable": false
+          },
+          {
+            "id": 5,
+            "name": "display_name",
+            "type": "VARCHAR",
+            "length": "100",
+            "nullable": true
+          },
+          {
+            "id": 6,
+            "name": "bio",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "id": 7,
+            "name": "avatar_url",
+            "type": "VARCHAR",
+            "length": "255",
+            "nullable": true
+          },
+          {
+            "id": 8,
+            "name": "role",
+            "type": "VARCHAR",
+            "length": "20",
+            "nullable": false,
+            "defaultValue": "user"
+          },
+          {
+            "id": 9,
+            "name": "is_active",
+            "type": "BOOLEAN",
+            "nullable": false,
+            "defaultValue": "true"
+          },
+          {
+            "id": 10,
+            "name": "email_verified_at",
+            "type": "TIMESTAMP",
+            "nullable": true
+          },
+          {
+            "id": 11,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          },
+          {
+            "id": 12,
+            "name": "updated_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          }
+        ]
+      }
+    },
+    {
+      "id": "categories",
+      "type": "table",
+      "position": { "x": 500, "y": 100 },
+      "data": {
+        "tableName": "categories",
+        "fields": [
+          {
+            "id": 13,
+            "name": "id",
+            "type": "BIGINT",
+            "nullable": false,
+            "primaryKey": true,
+            "autoIncrement": true,
+            "unique": true
+          },
+          {
+            "id": 14,
+            "name": "name",
+            "type": "VARCHAR",
+            "length": "100",
+            "nullable": false,
+            "unique": true
+          },
+          {
+            "id": 15,
+            "name": "slug",
+            "type": "VARCHAR",
+            "length": "100",
+            "nullable": false,
+            "unique": true
+          },
+          {
+            "id": 16,
+            "name": "description",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "id": 17,
+            "name": "color",
+            "type": "VARCHAR",
+            "length": "7",
+            "nullable": true
+          },
+          {
+            "id": 18,
+            "name": "is_active",
+            "type": "BOOLEAN",
+            "nullable": false,
+            "defaultValue": "true"
+          },
+          {
+            "id": 19,
+            "name": "sort_order",
+            "type": "INT",
+            "nullable": false,
+            "defaultValue": "0"
+          },
+          {
+            "id": 20,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tags",
+      "type": "table",
+      "position": { "x": 900, "y": 100 },
+      "data": {
+        "tableName": "tags",
+        "fields": [
+          {
+            "id": 21,
+            "name": "id",
+            "type": "BIGINT",
+            "nullable": false,
+            "primaryKey": true,
+            "autoIncrement": true,
+            "unique": true
+          },
+          {
+            "id": 22,
+            "name": "name",
+            "type": "VARCHAR",
+            "length": "50",
+            "nullable": false,
+            "unique": true
+          },
+          {
+            "id": 23,
+            "name": "slug",
+            "type": "VARCHAR",
+            "length": "50",
+            "nullable": false,
+            "unique": true
+          },
+          {
+            "id": 24,
+            "name": "color",
+            "type": "VARCHAR",
+            "length": "7",
+            "nullable": true
+          },
+          {
+            "id": 25,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          }
+        ]
+      }
+    },
+    {
+      "id": "posts",
+      "type": "table",
+      "position": { "x": 300, "y": 400 },
+      "data": {
+        "tableName": "posts",
+        "fields": [
+          {
+            "id": 26,
+            "name": "id",
+            "type": "BIGINT",
+            "nullable": false,
+            "primaryKey": true,
+            "autoIncrement": true,
+            "unique": true
+          },
+          {
+            "id": 27,
+            "name": "title",
+            "type": "VARCHAR",
+            "length": "255",
+            "nullable": false
+          },
+          {
+            "id": 28,
+            "name": "slug",
+            "type": "VARCHAR",
+            "length": "255",
+            "nullable": false,
+            "unique": true
+          },
+          {
+            "id": 29,
+            "name": "excerpt",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "id": 30,
+            "name": "content",
+            "type": "LONGTEXT",
+            "nullable": false
+          },
+          {
+            "id": 31,
+            "name": "author_id",
+            "type": "BIGINT",
+            "nullable": false,
+            "foreignKey": true,
+            "referencedTable": "users",
+            "referencedField": 1
+          },
+          {
+            "id": 32,
+            "name": "category_id",
+            "type": "BIGINT",
+            "nullable": true,
+            "foreignKey": true,
+            "referencedTable": "categories",
+            "referencedField": 13
+          },
+          {
+            "id": 33,
+            "name": "featured_image",
+            "type": "VARCHAR",
+            "length": "255",
+            "nullable": true
+          },
+          {
+            "id": 34,
+            "name": "status",
+            "type": "VARCHAR",
+            "length": "20",
+            "nullable": false,
+            "defaultValue": "draft"
+          },
+          {
+            "id": 35,
+            "name": "is_featured",
+            "type": "BOOLEAN",
+            "nullable": false,
+            "defaultValue": "false"
+          },
+          {
+            "id": 36,
+            "name": "view_count",
+            "type": "INT",
+            "nullable": false,
+            "defaultValue": "0"
+          },
+          {
+            "id": 37,
+            "name": "published_at",
+            "type": "TIMESTAMP",
+            "nullable": true
+          },
+          {
+            "id": 38,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          },
+          {
+            "id": 39,
+            "name": "updated_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          }
+        ]
+      }
+    },
+    {
+      "id": "post_tags",
+      "type": "table",
+      "position": { "x": 700, "y": 400 },
+      "data": {
+        "tableName": "post_tags",
+        "fields": [
+          {
+            "id": 40,
+            "name": "post_id",
+            "type": "BIGINT",
+            "nullable": false,
+            "primaryKey": true,
+            "foreignKey": true,
+            "referencedTable": "posts",
+            "referencedField": 26
+          },
+          {
+            "id": 41,
+            "name": "tag_id",
+            "type": "BIGINT",
+            "nullable": false,
+            "primaryKey": true,
+            "foreignKey": true,
+            "referencedTable": "tags",
+            "referencedField": 21
+          },
+          {
+            "id": 42,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          }
+        ]
+      }
+    },
+    {
+      "id": "comments",
+      "type": "table",
+      "position": { "x": 100, "y": 700 },
+      "data": {
+        "tableName": "comments",
+        "fields": [
+          {
+            "id": 43,
+            "name": "id",
+            "type": "BIGINT",
+            "nullable": false,
+            "primaryKey": true,
+            "autoIncrement": true,
+            "unique": true
+          },
+          {
+            "id": 44,
+            "name": "post_id",
+            "type": "BIGINT",
+            "nullable": false,
+            "foreignKey": true,
+            "referencedTable": "posts",
+            "referencedField": 26
+          },
+          {
+            "id": 45,
+            "name": "user_id",
+            "type": "BIGINT",
+            "nullable": true,
+            "foreignKey": true,
+            "referencedTable": "users",
+            "referencedField": 1
+          },
+          {
+            "id": 46,
+            "name": "parent_id",
+            "type": "BIGINT",
+            "nullable": true,
+            "foreignKey": true,
+            "referencedTable": "comments",
+            "referencedField": 43
+          },
+          {
+            "id": 47,
+            "name": "author_name",
+            "type": "VARCHAR",
+            "length": "100",
+            "nullable": true
+          },
+          {
+            "id": 48,
+            "name": "author_email",
+            "type": "VARCHAR",
+            "length": "255",
+            "nullable": true
+          },
+          {
+            "id": 49,
+            "name": "content",
+            "type": "TEXT",
+            "nullable": false
+          },
+          {
+            "id": 50,
+            "name": "status",
+            "type": "VARCHAR",
+            "length": "20",
+            "nullable": false,
+            "defaultValue": "pending"
+          },
+          {
+            "id": 51,
+            "name": "is_spam",
+            "type": "BOOLEAN",
+            "nullable": false,
+            "defaultValue": "false"
+          },
+          {
+            "id": 52,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          },
+          {
+            "id": 53,
+            "name": "updated_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          }
+        ]
+      }
+    },
+    {
+      "id": "likes",
+      "type": "table",
+      "position": { "x": 500, "y": 700 },
+      "data": {
+        "tableName": "likes",
+        "fields": [
+          {
+            "id": 54,
+            "name": "id",
+            "type": "BIGINT",
+            "nullable": false,
+            "primaryKey": true,
+            "autoIncrement": true,
+            "unique": true
+          },
+          {
+            "id": 55,
+            "name": "user_id",
+            "type": "BIGINT",
+            "nullable": false,
+            "foreignKey": true,
+            "referencedTable": "users",
+            "referencedField": 1
+          },
+          {
+            "id": 56,
+            "name": "post_id",
+            "type": "BIGINT",
+            "nullable": true,
+            "foreignKey": true,
+            "referencedTable": "posts",
+            "referencedField": 26
+          },
+          {
+            "id": 57,
+            "name": "comment_id",
+            "type": "BIGINT",
+            "nullable": true,
+            "foreignKey": true,
+            "referencedTable": "comments",
+            "referencedField": 43
+          },
+          {
+            "id": 58,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          }
+        ]
+      }
+    },
+    {
+      "id": "media",
+      "type": "table",
+      "position": { "x": 900, "y": 700 },
+      "data": {
+        "tableName": "media",
+        "fields": [
+          {
+            "id": 59,
+            "name": "id",
+            "type": "BIGINT",
+            "nullable": false,
+            "primaryKey": true,
+            "autoIncrement": true,
+            "unique": true
+          },
+          {
+            "id": 60,
+            "name": "filename",
+            "type": "VARCHAR",
+            "length": "255",
+            "nullable": false
+          },
+          {
+            "id": 61,
+            "name": "original_name",
+            "type": "VARCHAR",
+            "length": "255",
+            "nullable": false
+          },
+          {
+            "id": 62,
+            "name": "mime_type",
+            "type": "VARCHAR",
+            "length": "100",
+            "nullable": false
+          },
+          {
+            "id": 63,
+            "name": "file_size",
+            "type": "BIGINT",
+            "nullable": false
+          },
+          {
+            "id": 64,
+            "name": "path",
+            "type": "VARCHAR",
+            "length": "500",
+            "nullable": false
+          },
+          {
+            "id": 65,
+            "name": "alt_text",
+            "type": "VARCHAR",
+            "length": "255",
+            "nullable": true
+          },
+          {
+            "id": 66,
+            "name": "caption",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "id": 67,
+            "name": "uploaded_by",
+            "type": "BIGINT",
+            "nullable": false,
+            "foreignKey": true,
+            "referencedTable": "users",
+            "referencedField": 1
+          },
+          {
+            "id": 68,
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "nullable": false,
+            "defaultValue": "CURRENT_TIMESTAMP"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "posts-users",
+      "source": "posts",
+      "target": "users",
+      "sourceHandle": "posts-31-source",
+      "targetHandle": "users-1-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "31", "targetField": "1", "foreignKey": true }
+    },
+    {
+      "id": "posts-categories",
+      "source": "posts",
+      "target": "categories",
+      "sourceHandle": "posts-32-source",
+      "targetHandle": "categories-13-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "32", "targetField": "13", "foreignKey": true }
+    },
+    {
+      "id": "post_tags-posts",
+      "source": "post_tags",
+      "target": "posts",
+      "sourceHandle": "post_tags-40-source",
+      "targetHandle": "posts-26-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "40", "targetField": "26", "foreignKey": true }
+    },
+    {
+      "id": "post_tags-tags",
+      "source": "post_tags",
+      "target": "tags",
+      "sourceHandle": "post_tags-41-source",
+      "targetHandle": "tags-21-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "41", "targetField": "21", "foreignKey": true }
+    },
+    {
+      "id": "comments-posts",
+      "source": "comments",
+      "target": "posts",
+      "sourceHandle": "comments-44-source",
+      "targetHandle": "posts-26-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "44", "targetField": "26", "foreignKey": true }
+    },
+    {
+      "id": "comments-users",
+      "source": "comments",
+      "target": "users",
+      "sourceHandle": "comments-45-source",
+      "targetHandle": "users-1-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "45", "targetField": "1", "foreignKey": true }
+    },
+    {
+      "id": "comments-comments",
+      "source": "comments",
+      "target": "comments",
+      "sourceHandle": "comments-46-source",
+      "targetHandle": "comments-43-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "46", "targetField": "43", "foreignKey": true }
+    },
+    {
+      "id": "likes-users",
+      "source": "likes",
+      "target": "users",
+      "sourceHandle": "likes-55-source",
+      "targetHandle": "users-1-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "55", "targetField": "1", "foreignKey": true }
+    },
+    {
+      "id": "likes-posts",
+      "source": "likes",
+      "target": "posts",
+      "sourceHandle": "likes-56-source",
+      "targetHandle": "posts-26-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "56", "targetField": "26", "foreignKey": true }
+    },
+    {
+      "id": "likes-comments",
+      "source": "likes",
+      "target": "comments",
+      "sourceHandle": "likes-57-source",
+      "targetHandle": "comments-43-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "57", "targetField": "43", "foreignKey": true }
+    },
+    {
+      "id": "media-users",
+      "source": "media",
+      "target": "users",
+      "sourceHandle": "media-67-source",
+      "targetHandle": "users-1-target",
+      "type": "smoothstep",
+      "style": { "stroke": "#3b82f6", "strokeWidth": 2 },
+      "markerEnd": { "type": "arrowclosed", "color": "#3b82f6" },
+      "data": { "sourceField": "67", "targetField": "1", "foreignKey": true }
+    }
+  ],
+  "schema": {},
+  "timestamp": "2024-12-22T00:00:00.000Z",
+  "version": "1.0"
+}

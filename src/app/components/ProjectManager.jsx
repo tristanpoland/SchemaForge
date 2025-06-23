@@ -1,13 +1,45 @@
-"use client";
-
 // components/ProjectManager.jsx
 import React, { useState, useRef } from 'react';
 import { 
-  Plus, Database, FolderOpen, FileText, File 
+  Plus, Database, FolderOpen, FileText, File, Download 
 } from 'lucide-react';
 
 const ProjectManager = ({ onOpenProject, onNewProject }) => {
   const fileInputRef = useRef(null);
+
+  // Sample projects array - add your .sf filenames here
+  const sampleProjects = [
+    {
+      name: "E-commerce Database",
+      filename: "ecommerce-schema.sf",
+      description: "Complete online store schema with users, products, orders"
+    },
+    {
+      name: "Blog Platform",
+      filename: "blog-platform.sf", 
+      description: "Multi-user blog system with posts, comments, categories"
+    },
+    // {
+    //   name: "Social Media App",
+    //   filename: "social-media.sf",
+    //   description: "Social network schema with users, posts, follows, likes"
+    // },
+    // {
+    //   name: "Library Management",
+    //   filename: "library-system.sf",
+    //   description: "Library system with books, members, loans, reservations"
+    // },
+    // {
+    //   name: "Hospital Management",
+    //   filename: "hospital-system.sf",
+    //   description: "Healthcare system with patients, doctors, appointments"
+    // },
+    // {
+    //   name: "School Management",
+    //   filename: "school-system.sf",
+    //   description: "Education system with students, courses, grades, enrollment"
+    // }
+  ];
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -26,6 +58,19 @@ const ProjectManager = ({ onOpenProject, onNewProject }) => {
       alert('Please select a valid .sf or .json file.');
     }
     event.target.value = '';
+  };
+
+  const handleSampleProjectLoad = async (sample) => {
+    try {
+      const response = await fetch(`/samples/${sample.filename}`);
+      if (!response.ok) {
+        throw new Error(`Sample project not found: ${sample.filename}`);
+      }
+      const projectData = await response.json();
+      onOpenProject(projectData, sample.filename);
+    } catch (error) {
+      alert(`Error loading sample project: ${error.message}`);
+    }
   };
 
   return (
@@ -89,6 +134,38 @@ const ProjectManager = ({ onOpenProject, onNewProject }) => {
                     <p className="text-gray-400">Learn how to use SchemaForge</p>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Sample Projects */}
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-6">
+                <Download className="text-orange-400" size={24} />
+                <h2 className="text-2xl font-bold text-white">Sample Projects</h2>
+                <p className="text-gray-400">Explore pre-built database schemas</p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {sampleProjects.map((sample, index) => (
+                  <div
+                    key={index}
+                    onClick={() => handleSampleProjectLoad(sample)}
+                    className="bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700 hover:border-orange-400 cursor-pointer transition-all hover:shadow-xl group"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 bg-orange-900 rounded-lg group-hover:bg-orange-800 flex-shrink-0">
+                        <Database className="text-orange-400" size={16} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-md font-semibold text-white mb-1 truncate">{sample.name}</h3>
+                        <p className="text-sm text-gray-400 line-clamp-2">{sample.description}</p>
+                        <div className="mt-2">
+                          <span className="text-xs text-orange-400 font-mono">{sample.filename}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
