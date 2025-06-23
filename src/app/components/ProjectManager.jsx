@@ -62,7 +62,12 @@ const ProjectManager = ({ onOpenProject, onNewProject }) => {
 
   const handleSampleProjectLoad = async (sample) => {
     try {
-      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+      // Get base path from env or default to empty string, and handle GitHub Pages path
+      const basePath = typeof window !== 'undefined' 
+        ? (process.env.NEXT_PUBLIC_BASE_PATH || window.location.pathname.endsWith('/') 
+            ? window.location.pathname.slice(0, -1) 
+            : window.location.pathname) 
+        : '';
       const response = await fetch(`${basePath}/samples/${sample.filename}`);
       if (!response.ok) {
         throw new Error(`Sample project not found: ${sample.filename}`);
